@@ -42,7 +42,7 @@ export default function Home() {
   }, [currentMedia]);
 
   // PRECIO FIJO POR PAQUETE
-  const PRECIO_POR_PAQUETE = 15000;
+  const PRECIO_POR_PAQUETE = Number(process.env.NEXT_PUBLIC_PRECIO_PAQUETE) || 15000;
 
 const opcionesEnvio = [
     { id: "retiro", label: "Retiro en La Plata (Gratis)", costo: 0 },
@@ -101,17 +101,14 @@ const [formData, setFormData] = useState({
     setIsSubmitting(false);
 
     if (respuesta.success) {
-      // 2. Armamos el mensaje para WhatsApp
       const textoMensaje = `Hola! Acabo de hacer un pedido de ${formData.cantidad} paquetes de saquitos a nombre de ${formData.nombre} ${formData.apellido}. Te adjunto el comprobante de pago por $${total.toLocaleString('es-AR')}:`;
       
-      // CAMBIÁ ESTE NÚMERO POR EL TUYO (Formato internacional sin el '+')
-      const urlWa = `https://wa.me/5492216397422?text=${encodeURIComponent(textoMensaje)}`; 
+      const numeroAdmin = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5492210000000";
+      const urlWa = `https://wa.me/${numeroAdmin}?text=${encodeURIComponent(textoMensaje)}`; 
       
-      // 3. Abrimos WhatsApp y cerramos el modal
       window.open(urlWa, "_blank");
       setIsModalOpen(false); 
       
-      // Limpiamos el formulario para el próximo pedido
       setFormData({ ...formData, nombre: "", apellido: "", email: "", telefono: "", direccion: "", cantidad: 1 });
     } else {
       alert("Hubo un error al registrar el pedido, intentá de nuevo.");
@@ -289,10 +286,11 @@ return (
             <div className="bg-[#fcf3f5] p-4 rounded-lg border border-[#e6b8c1] mt-2 text-center">
               <p className="text-sm text-[#8c1f35] mb-1">Total a transferir:</p>
               <p className="text-3xl font-black text-[#6b0e21] mb-4">${total.toLocaleString('es-AR')}</p>
-              
               <div className="text-sm text-gray-600 bg-white p-3 rounded border border-[#e6b8c1]">
                 <p>Transferir al alias:</p>
-                <p className="font-bold text-gray-800 text-lg my-1">martin.anto.mp</p>
+                <p className="font-bold text-gray-800 text-lg my-1">
+                  {process.env.NEXT_PUBLIC_ALIAS || "DELICE.TE"}
+                </p>
                 <p className="text-xs">A nombre de Martín Uriel Antonovich</p>
               </div>
             </div>
